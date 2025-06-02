@@ -1,0 +1,24 @@
+name: Daily Quote Commit
+
+on:
+  schedule:
+    - cron: '0 1 * * *'  # every day at 01:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update-quote:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Fetch quote and commit
+        run: |
+          quote=$(curl -s https://api.quotable.io/random | jq -r '.content + " — " + .author')
+          echo "$(date): $quote" >> quotes.txt
+          git config --global user.name "Ravi-vira"
+          git config --global user.email "vira5642@gmail.com"
+          git add quotes.txt
+          git commit -m "📜 Added quote for $(date +'%Y-%m-%d')"
+          git push
